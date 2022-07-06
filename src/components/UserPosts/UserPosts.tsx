@@ -1,37 +1,47 @@
-import { FC, useCallback, useEffect, useState } from "react";
-import { getPosts } from "../../api/api";
-import { IUserPosts } from "./model";
+import { FC, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { shallowEqual, useDispatch } from "react-redux";
+import { useAppSelector } from "../../store/hook";
+import { fetchUsersPosts } from "../../store/features/users/usersSliceFunction";
+import { TAppDispatch } from "../../store/store";
 
 interface IUserPostsProps {
   clickedUser: number;
 }
 
 const UserPosts: FC<IUserPostsProps> = ({ clickedUser }): JSX.Element => {
-  const [posts, setPosts] = useState<IUserPosts[]>([]);
+  const dispatch: TAppDispatch = useDispatch();
 
-  console.log(clickedUser, "clickedUser");
-  console.log(posts);
-  const getUserPosts = useCallback(async () => {
-    try {
-      const data = await getPosts();
-      setPosts(data);
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
+  const {
+    data: { users },
+    loading,
+  } = useAppSelector(({ users }) => users, shallowEqual);
 
   useEffect(() => {
-    getUserPosts();
+    dispatch(fetchUsersPosts());
   }, []);
 
+  const navigate = useNavigate();
   return (
     <>
-      <h1>UserPosts</h1>
-      {posts?.map(({ userId, title }) => {
-        if (userId === clickedUser) {
-          return <div>{title}</div>;
-        }
-      })}
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <>
+          <h1>UserPosts</h1>
+          {users.length > 0 &&
+            users?.map(({ userId, title, id }) => {
+              if (userId === clickedUser) {
+                return <div key={id}>{title}</div>;
+              }
+            })}
+
+          <div>
+            <button onClick={() => navigate("../user")}>Back</button>
+          </div>
+        </>
+      )}
     </>
   );
 };

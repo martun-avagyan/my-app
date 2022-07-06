@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getUsers } from "../../api/api";
+import Photos from "../Photos/Photos";
 import { IUserInterface } from "./model";
 
 interface IUsersProps {
@@ -26,6 +27,7 @@ const Users: FC<IUsersProps> = ({ setClickedUser }): JSX.Element => {
   return (
     <>
       <h1>Test Component</h1>
+      <Photos />
       {users.map(({ id, name }) => (
         <Link to={`/user/${id}`} key={id} onClick={() => setClickedUser(id)}>
           {name}
